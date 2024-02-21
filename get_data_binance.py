@@ -60,7 +60,7 @@ def getbinanceweekly(start = "18 Aug 2017", sym = "BTCUSDT"):
     df.index = [dt.datetime.fromtimestamp(int(x)/1000) for x in df.date]
 
     L = df['date'].values
-    L = list(range(L[0],L[-1]+1, 24*3600*1000))
+    L = list(range(L[0],L[-1]+1, 7*24*3600*1000))
     for i,a in enumerate(L) :
         L[i] = dt.datetime.fromtimestamp(a/1000)
     df = df.reindex(L,method="ffill")
