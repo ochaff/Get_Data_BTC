@@ -58,7 +58,17 @@ def getbinanceweekly(start="18 Aug 2017", sym="BTCUSDT"):
     df = pd.DataFrame(klines)
     df = df.iloc[:, 0:6]
     df.columns = ['date', 'open', 'high', 'low', 'close', 'volume']
-    df['date'] = pd.to_datetime(df['date'], unit='ms')
+    df.index = [dt.datetime.fromtimestamp(int(x)/1000) for x in df.date]
+
+    L = df['date'].values
+    L = list(range(L[0],L[-1]+1, 7*24*3600*1000))
+    for i,a in enumerate(L) :
+        L[i] = dt.datetime.fromtimestamp(a/1000)
+    df = df.reindex(L,method="ffill")
+
+    df = df.assign(date=L)
+    df = df_column_switch(df, 'close', 'volume')
+    df.drop(index=L[0], axis=0)
 
     return df
 
