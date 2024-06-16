@@ -139,11 +139,11 @@ if __name__ == '__main__' :
     print(df.head)
    
    
-    # fracdiff = tsfracdiff.FractionalDifferentiator(maxOrderBound= 1, precision = 0.01, memoryThreshold= 0.001, unitRootTest='ADF')
-    # fracdiff.numLags = 20
-    # df = fracdiff.FitTransform(df)
-    # Info = {'orders': fracdiff.orders, 'numLags': fracdiff.numLags}
-    # print(Info['orders'])
+    fracdiff = tsfracdiff.FractionalDifferentiator(maxOrderBound= 1, precision = 0.01, memoryThreshold= 0.001, unitRootTest='ADF')
+    fracdiff.numLags = 20
+    df = fracdiff.FitTransform(df)
+    Info = {'orders': fracdiff.orders, 'numLags': fracdiff.numLags}
+    print(Info['orders'])
     # with open('/home/owen/Documents/NeurIPS2023-One-Fits-All/Long-term_Forecasting/datasets/BTC/params_diff_ADF.pkl', 'wb') as file :
     #     pkl.dump(Info, file)
     #     print(Info['numLags'])
@@ -152,6 +152,7 @@ if __name__ == '__main__' :
     r = r.json()['data']
     dfG = pd.DataFrame(r)
     dfG =dfG.iloc[::-1]
+
     dfG['timestamp'].values
     dfG.index = [dt.datetime.fromtimestamp(int(x)) for x in dfG.timestamp]
     L = dfG['timestamp'].values
@@ -160,7 +161,7 @@ if __name__ == '__main__' :
     for i,a in enumerate(L) :
         L[i] = dt.datetime.fromtimestamp(a)
     dfG = dfG.reindex(L,method="ffill")
-
+    print(dfG.index)
 
     df['trend_sup'] = D2[-len(df.index):]
     df['trend_res'] = D[-len(df.index):]
@@ -172,14 +173,14 @@ if __name__ == '__main__' :
 
     # df['Boll_Top'], df['Boll_Bot'] = Bollinger(df, 24, price, delta)
     df = df.dropna()
-    df = df.iloc[-len(dfG.index):]
-    df['sentiment'] = dfG['value'].values
+    df = df.iloc[-(len(dfG.index)-27):]
+    df['sentiment'] = dfG['value'].values[:-27]
     print(dfG['value'])
 
     # cols2 = ['date', 'price', 'price_high', 'price_low', 'price_open', 'close']
     # df2 = df[cols2]
 
-    cols = ['date', 'volume', 'vol', 'RSI_14', 'EMA_50', 'ADX', 'sentiment', 'trend_sup', 'trend_res', 'open', 'high', 'low', 'close']
+    cols = ['date', 'volume', 'vol', 'RSI_14', 'ADX', 'sentiment', 'open', 'high', 'low', 'close']
     df = df[cols]
 
     # df = df_column_switch(df, 'close', 'neg') 
@@ -188,8 +189,8 @@ if __name__ == '__main__' :
     # df = df_column_switch(df, 'low', 'open') 
 
 
+    df.to_csv("/home/owen/Documents/NeurIPS2023-One-Fits-All/Long-term_Forecasting/datasets/BTC/BTC_Daily_fracdiffnodata.csv", index=False)
     # df.to_csv("/home/owen/Documents/NeurIPS2023-One-Fits-All/Long-term_Forecasting/datasets/BTC/BTC_DailyfracdiffADF_price.csv", index=False)
-    # df.to_csv("/home/owen/Documents/NeurIPS2023-One-Fits-All/Long-term_Forecasting/datasets/BTC/BTC_Daily_fracdiffsenttest.csv", index=False)
     # df.to_csv("/home/owen/Documents/NeurIPS2023-One-Fits-All/Long-term_Forecasting/datasets/BTC/BTC_Daily_sentiment.csv", index=False)
     # df2.to_csv("/home/owen/Documents/NeurIPS2023-One-Fits-All/Long-term_Forecasting/datasets/BTC/BTC_DailyfracdiffADF.csv", index=False)
     
